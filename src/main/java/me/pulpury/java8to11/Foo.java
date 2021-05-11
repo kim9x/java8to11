@@ -1,5 +1,7 @@
 package me.pulpury.java8to11;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
@@ -96,6 +98,53 @@ public class Foo {
 		
 		Foo foo = new Foo();
 		foo.run();
+		
+		// 아래처럼 '타입::스태틱 메소드'처럼 사용하면 static method 
+		UnaryOperator<String> hi = Greeting::hi;
+		System.out.println(hi.apply("taeju"));
+		
+		// 인스턴스 메소드 참조
+		Greeting greeting = new Greeting();
+		UnaryOperator<String> hello = greeting::hello;
+		
+		// 파라미터가 없는 생성자 참조
+		// 아래 한줄 자체로 아무런 일도 벌어지지 않음.
+		Supplier<Greeting> newGreeting = Greeting::new;
+		// 이렇게 해야 객체 생성됨
+		newGreeting.get();
+		
+		// 파라미터가 있는 생성자 참조
+		Function<String, Greeting> taejuGreeting = Greeting::new;
+		Greeting taeju = taejuGreeting.apply("taeju");
+		System.out.println(taeju.getName());
+		
+		
+		String [] names = {"taeju", "pulpury", "toby"};
+		
+		Arrays.sort(names, new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+		});
+		// Comparator 또한 추상 메소드 이므로 아래 처럼 표현 가능
+		Arrays.sort(names, (o1, o2) -> {
+		 	if (o1 == o2)
+		    	return 1;
+		    else
+		    	return 0;
+		});
+		
+		// 위의 람다를 아래처럼 표현 가능.
+		// 임의 객체의 인스턴스 메소드 참조
+		// 임의 개수 인자들(ex. "taeju", "pulpury", "toby")이 
+		// String의 compareToIngnoreCase를 사용하여 정렬된다.
+		Arrays.sort(names, String::compareToIgnoreCase);
+		// 아래의 코드로 확인 가능
+		System.out.println(Arrays.toString(names));
+		
+		
 	}
 
 	private void run() {
@@ -137,5 +186,7 @@ public class Foo {
 		
 		printInt.accept(10);
 	}
+	
+	
 
 }
