@@ -4,6 +4,7 @@ import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -92,6 +93,49 @@ public class Foo {
 		// Function의 디폴트 메서드를 사용할 수 있다!
 		UnaryOperator<Integer> plus10_5 = (i) -> i + 10;
 		System.out.println(plus10_5.apply(30));
+		
+		Foo foo = new Foo();
+		foo.run();
+	}
+
+	private void run() {
+		// java 8 이전에는 final이라는 키워가 붙어있어야만
+		// 익명 내부 클래스에서 사용할 수 잇었음
+		// java 8 이후부터는 final 키워드 생략 가능
+		// effective final이라고 함.		
+
+		final int baseNumber = 10;
+		
+		// 로컬 클래스
+		// 개별 scope을 가진다.
+		// 쉐도잉 가능.
+		class LocalClass {
+			void printBaseNumber() {
+				System.out.println(baseNumber);
+			}
+		}
+		
+		// 익명 클래스
+		// 개별 scope을 가진다.
+		// 쉐도잉 가능.
+		Consumer<Integer> integerConsumer = new Consumer<Integer>() {
+
+			@Override
+			public void accept(Integer t) {
+				System.out.println(baseNumber);
+			}
+			
+		};
+		
+		// 람다
+		// 위의 익명, 내부 클래스와 달리 쉐도윙하지 않는다. (동일 이름의 변수 선언 불가)
+		// 위의 두 클래스는 scope이 새로 생기지만
+		// 람다의 경우엔 run과 scope이 같기 때문
+		IntConsumer printInt = (i) -> {
+			System.out.println(i + baseNumber);
+		};
+		
+		printInt.accept(10);
 	}
 
 }
