@@ -144,7 +144,7 @@ public class Foo {
 		// 아래의 코드로 확인 가능
 		System.out.println(Arrays.toString(names));
 		
-		
+		// 
 	}
 
 	private void run() {
