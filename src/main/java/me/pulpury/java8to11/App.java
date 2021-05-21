@@ -1,11 +1,10 @@
 package me.pulpury.java8to11;
 
+import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 public class App {
 	
@@ -17,69 +16,22 @@ public class App {
         springClasses.add(new OnlineClass(3, "spring mvc", false));
         springClasses.add(new OnlineClass(4, "spring core", false));
         springClasses.add(new OnlineClass(5, "rest api development", false));
-
-        List<OnlineClass> javaClasses = new ArrayList<>();
-        javaClasses.add(new OnlineClass(6, "The Java, Test", true));
-        javaClasses.add(new OnlineClass(7, "The Java, Code manipulation", true));
-        javaClasses.add(new OnlineClass(8, "The Java, 8 to 11", false));
-
-        List<List<OnlineClass>> keesunEvents = new ArrayList<>();
-        keesunEvents.add(springClasses);
-        keesunEvents.add(javaClasses);
-
-        System.out.println("spring 으로 시작하는 수업");
-        springClasses.stream()
-        	.filter(oc -> oc.getTitle().startsWith("spring"))
-        	.forEach(oc -> System.out.println(oc.getId()));
         
-        System.out.println("=======================================");
+        OnlineClass spring_boot = new OnlineClass(1, "spring boot", true);
+//        Duration studyDurtaion = spring_boot.getProgress().getStudyDuration();
+//        System.out.println(studyDurtaion);
         
-        System.out.println("close 되지 않은 수업");
-        springClasses.stream().filter(oc -> !oc.isClosed())
-        	.forEach(oc -> System.out.println(oc.getId()));
+//        Progress progress = spring_boot.getProgress();
+//        if ( progress != null) {
+//        	System.out.println(progress.getStudyDuration());
+//        }
         
-        springClasses.stream()
-        	.filter(Predicate.not(OnlineClass::isClosed))
-        	.forEach(oc -> System.out.println(oc.getId()));
+        // primitive type의 경우 아래처럼 사용할 시
+        // 박싱 언박싱이 일어나기 때문에(성능 저하 우려)
+        Optional.of(10);
+        // 아래처럼 지원해주는 OptionalInt 같은 것을 사용하자.!
+        OptionalInt.of(10);
         
-        System.out.println("=======================================");
-        
-        System.out.println("수업 이름만 모아서 스트림 만들기");
-        springClasses.stream()
-        	.map(oc -> oc.getTitle())
-//        	.forEach(s -> System.out.println(s));
-        	.forEach(System.out::println);
-        
-        springClasses.stream()
-    	.map(OnlineClass::getTitle)
-    	.forEach(System.out::println);
-        
-        System.out.println("=======================================");
-
-        System.out.println("두 수업 목록에 들어있는 모든 수업 아이디 출력");
-        keesunEvents.stream().flatMap(list -> list.stream())
-        			.forEach(oc -> System.out.println(oc.getId()));
-        keesunEvents.stream().flatMap(Collection::stream)
-					.forEach(oc -> System.out.println(oc.getId()));
-
-        System.out.println("10부터 1씩 증가하는 무제한 스트림 중에서 앞에 10개 빼고 최대 10개 까지만");
-        Stream.iterate(10, i -> i + 1)
-        	.skip(10)
-        	.limit(10)
-//        	.forEach(i -> System.out.println(i));
-        	.forEach(System.out::println);
-
-        System.out.println("자바 수업 중에 Test가 들어있는 수업이 있는지 확인");
-        boolean test = javaClasses.stream().anyMatch(oc -> oc.getTitle().contains("Test"));
-        System.out.println(test);
-
-        System.out.println("스프링 수업 중에 제목에 spring이 들어간 것만 모아서 List로 만들기");
-        List<String> spring = springClasses.stream()
-        		.filter(oc -> oc.getTitle().contains("spring"))
-        		.map(OnlineClass::getTitle)
-        		.collect(Collectors.toList());
-        spring.forEach(System.out::println);
-        spring.forEach(s -> System.out.println(s));
         
 		
 	}
