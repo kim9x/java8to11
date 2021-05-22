@@ -53,7 +53,9 @@ public class OnlineClass {
 		// null이 들어올만한 상황이 아니라면 'of'를 사용한다.
 		// 이 때, 만약 null이 들어올다면 NullPointerException이 발생한다.
 		// null이 들어올 수 있으면 'ofNullable'을 사용해줘야한다.
-		return Optional.ofNullable(progress);
+//		return Optional.ofNullable(progress);
+		
+		return Optional.empty();
 		
 		// null을 return 하지 말자. (return null;)
 		// Optional을 리턴하자.! (Optional.empty();)
