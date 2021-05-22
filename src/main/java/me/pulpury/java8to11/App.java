@@ -1,105 +1,96 @@
 package me.pulpury.java8to11;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 public class App {
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		
-		List<OnlineClass> springClasses = new ArrayList<>();
-        springClasses.add(new OnlineClass(1, "spring boot", true));
-        springClasses.add(new OnlineClass(2, "spring data jpa", true));
-        springClasses.add(new OnlineClass(3, "spring mvc", false));
-        springClasses.add(new OnlineClass(4, "spring core", false));
-        springClasses.add(new OnlineClass(5, "rest api development", false));
-        
-        OnlineClass spring_boot = new OnlineClass(1, "spring boot", true);
-//        Duration studyDurtaion = spring_boot.getProgress().getStudyDuration();
-//        System.out.println(studyDurtaion);
-        
-//        Progress progress = spring_boot.getProgress();
-//        if ( progress != null) {
-//        	System.out.println(progress.getStudyDuration());
-//        }
-        
-        // primitive type의 경우 아래처럼 사용할 시
-        // 박싱 언박싱이 일어나기 때문에(성능 저하 우려)
-        Optional.of(10);
-        // 아래처럼 지원해주는 OptionalInt 같은 것을 사용하자.!
-        OptionalInt.of(10);
-        
-        Optional<OnlineClass> onlineClass = springClasses.stream()
-        	.filter(oc -> oc.getTitle().startsWith("jpa"))
-        	.findFirst();
-        
-        boolean present = onlineClass.isPresent();
-        System.out.println(present);
-        
-//        if (onlineClass.isPresent()) {
-//    	OnlineClass onlineClass1 = onlineClass.get();
-//    	System.out.println(onlineClass1.getTitle());        	
-//        }
-        
-//        OnlineClass onlineClass1 = onlineClass.get();
-//    	System.out.println(onlineClass1.getTitle());
-    	
-    	onlineClass.ifPresent(oc -> {
-    		System.out.println(oc.getTitle());
-    	});
-    	
-    	// 'orElse' 사용 시 무조건 'createNewClass()' 메서드가 실행된다. 
-//    	OnlineClass onlineClass2 = onl?ineClass.orElse(createNewClass());
-    	
-    	// 'orElseGet'을 사용하면 있는 경우엔 실행되지 않는다.
-//    	OnlineClass onlineClass2 = onlineClass.orElseGet(() -> createNewClass());
-//    	OnlineClass onlineClass2 = onlineClass.orElseGet(App::createNewClass);
-//    	System.out.println(onlineClass2.getTitle());
-    	
-//    	OnlineClass onlineClass3 = onlineClass.orElseThrow(() -> {
-//    		return new IllegalArgumentException();
-//    	});
-    	
-//    	OnlineClass onlineClass3 = onlineClass.orElseThrow(IllegalStateException::new);
-    	
-    	Optional<OnlineClass> onlineClass4 = onlineClass
-    								.filter(oc -> oc.getId() > 10);
-    	
-    	Optional<OnlineClass> onlineClass5 = onlineClass
-//				.filter(oc -> !oc.isClosed());
-    			.filter(OnlineClass::isClosed);
-    	
-    	System.out.println(onlineClass5.isEmpty());
-    	
-    	Optional<Integer> id = onlineClass.map(oc -> oc.getId());
-    	Optional<Integer> id2 = onlineClass.map(OnlineClass::getId);
-    	
-    	System.out.println(id.isPresent());
-    	
-    	// Optional 안에 Optional이 있다.
-    	// 아래처럼 flatMap을 사용하면 한번에 처리가 가능하다.
-    	// Why? Optional 안의 map을 한번 까주기 때문.
-//    	Optional<Optional<Progress>> progress = onlineClass.map(OnlineClass::getProgress);
-//    	Optional<Progress> progress1 = progress.orElse(Optional.empty());
-//    	progress1.orElseThrow();
-    	
-    	// flatMap 사용 시 
-    	// 위의 progress1 과정까지 한번에 처리가 가능하다.
-		Optional<Progress> progress = onlineClass.flatMap(OnlineClass::getProgress);
+		// Instant는 기계용, 시간을 재거나 비교할 때 주로 사용.
+		Instant instant = Instant.now();
+		System.out.println(instant);	// 기준 시 UTC: GMT
+		System.out.println(instant.atZone(ZoneId.of("UTC")));
 		
-		// Stream의 flatMap과는 다르다.
-		// list에 담고 있는 container 성격 안에 있는 것을 가져올 때..
-		// input은 하나이지만 output은 여러 개 일 때 사용.
-    	
+		ZoneId zone = ZoneId.systemDefault();
+		System.out.println(zone);
+		ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+		System.out.println(zonedDateTime);
 		
-	}
-
-	private static OnlineClass createNewClass() {
-		// TODO Auto-generated method stub
-		System.out.println("createing new online class");
-		return new OnlineClass(10, "New class", false);
+		
+		// LocalDateTime은 사람용,
+		// Local을 보면 알겠지만 현재 속해있는 zone을 참고해줌.
+		LocalDateTime now = LocalDateTime.now();
+		System.out.println(now);
+		
+		LocalDateTime birthDay = LocalDateTime.of(1996, Month.JANUARY, 5, 0, 0, 0);
+		
+		ZonedDateTime nowInLA = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
+		System.out.println(nowInLA);
+		
+		Instant nowInstant = Instant.now();
+		ZonedDateTime zonedDateTime2 = nowInstant.atZone(ZoneId.of("America/Los_Angeles"));
+		System.out.println(zonedDateTime2);
+		
+		// Instant와 ZonedDateTime의 변환이 자유롭다.
+		Instant zonedToInstant = zonedDateTime.toInstant();
+		
+		LocalDate today = LocalDate.now();
+		LocalDate thisYearBirthday = LocalDate.of(2021, Month.JANUARY, 5);
+		
+		Period period = Period.between(today, thisYearBirthday);
+		System.out.println(period.getDays());
+		
+		Period until = today.until(thisYearBirthday);
+		System.out.println(until.get(ChronoUnit.DAYS));
+		
+		Instant plus = nowInstant.plus(10, ChronoUnit.SECONDS);
+		Duration between = Duration.between(nowInstant, plus);
+		System.out.println(between.getSeconds());
+		
+		// 머신용 시간을 비교할 땐 Duration를 사용
+		// 휴먼용 시간을 비교할 땐 Period를 사용
+		
+		
+		System.out.println(now);
+		DateTimeFormatter MMddYYYY = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+		System.out.println(now.format(MMddYYYY));
+		
+		LocalDate parse = LocalDate.parse("07/15/1982", MMddYYYY);
+		System.out.println(parse);
+		
+		// Date와 Instant 사이의 형 변환이 자유롭다.
+		Date date = new Date();
+		Instant instant2 = date.toInstant();
+		Date newDate = Date.from(instant2);
+		
+		GregorianCalendar gregorianCalendar = new GregorianCalendar();
+		LocalDateTime localDateTime = gregorianCalendar.toInstant().atZone(ZoneId.systemDefault())
+				.toLocalDateTime();
+		
+		ZonedDateTime zonedDateTime3 = gregorianCalendar.toInstant().atZone(ZoneId.systemDefault());
+		
+		GregorianCalendar from = GregorianCalendar.from(zonedDateTime3);
+		
+		ZoneId zoneId = TimeZone.getTimeZone("PST").toZoneId();
+		TimeZone timeZone = TimeZone.getTimeZone(zoneId);
+		
+		LocalDateTime now2 = localDateTime.now();
+		LocalDateTime plus2 = now2.plus(10, ChronoUnit.DAYS);
+		
 	}
 }
