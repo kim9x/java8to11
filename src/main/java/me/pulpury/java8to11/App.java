@@ -1,65 +1,103 @@
 package me.pulpury.java8to11;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 public class App {
 	
 	public static void main(String[] args) throws InterruptedException, ExecutionException {
-		
-		ExecutorService executorService = Executors.newFixedThreadPool(4);
-		Future<String> future = executorService.submit(() -> "Hello");
-		
-		future.get();
-//		System.out.println(future.get());
-		
-		CompletableFuture<String> future2 = new CompletableFuture<>();
-		future2.complete("Taeju");
-//		System.out.println(future2.get());
-		 
-		CompletableFuture<String> future3 = CompletableFuture.completedFuture("taeju");
-//		System.out.println(future3.get());
-		  
-		CompletableFuture<Void> future4 = CompletableFuture.runAsync(() -> {
-//			System.out.println("Hello " + Thread.currentThread().getName());
-		});
-//		future4.get();
-		
-		CompletableFuture<String> future5 = CompletableFuture.supplyAsync(() -> {
+		CompletableFuture<String> hello = CompletableFuture.supplyAsync(() -> {
 			System.out.println("Hello " + Thread.currentThread().getName());
 			return "Hello";
-		})
-		// Function이 들어오므로 Return 값 지정 가능.
-		.thenApply((s) ->  {
-			System.out.println(Thread.currentThread().getName());
-			return s.toUpperCase();
 		});
 		
-		System.out.println(future5.get());
+		CompletableFuture<String> future = hello.thenCompose(App::getWorld);
 		
+		System.out.println(future.get());
 		
-		CompletableFuture<Void> future6 = CompletableFuture.supplyAsync(() -> {
-//			System.out.println("Hello " + Thread.currentThread().getName());
+		CompletableFuture<String> hello2 = CompletableFuture.supplyAsync(() -> {
+			System.out.println("Hello2 " + Thread.currentThread().getName());
+			return "Hello2";
+		});
+		
+		CompletableFuture<String> world2 = CompletableFuture.supplyAsync(() -> {
+			System.out.println("World2 " + Thread.currentThread().getName());
+			return "World2";
+		});
+		
+		CompletableFuture<String> future2 = hello2.thenCombine(world2, (h, w) -> h + " " + w);
+		System.out.println(future2.get());
+		
+		// 아래는 null 값이 나온다.
+		CompletableFuture<Void> future3 = CompletableFuture.allOf(hello2, world2)
+					.thenAccept((result) -> {
+						System.out.println(result);
+					});
+		
+		System.out.println(future3.get());
+		
+		List<CompletableFuture> futures = Arrays.asList(hello2, future2);
+		
+		CompletableFuture<Void> futureArray = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+		
+		CompletableFuture<List<Object>> results = CompletableFuture.allOf(futureArray)
+				.thenApply((v) -> {
+					return futures.stream()
+							.map(CompletableFuture::join)
+							.collect(Collectors.toList());
+				});
+		
+		results.get().forEach(System.out::println);
+		
+		System.out.println(results.get());
+		
+		CompletableFuture<Void> future4 = CompletableFuture.anyOf(hello2, world2).thenAccept((s) -> {
+			System.out.println(s);
+		});
+		
+		future4.get();
+		
+		boolean throwError = true;
+		
+		CompletableFuture<String> hello5 = CompletableFuture.supplyAsync(() -> {
+			if (throwError) {
+				throw new IllegalArgumentException();
+			}
+			
+			System.out.println("Hello5 " + Thread.currentThread().getName());
 			return "Hello";
-		})
-		// Consumer가 들어오므로 return 값을 void형
-		.thenAccept((s) -> {
-			System.out.println(Thread.currentThread().getName());
-			System.out.println(s.toUpperCase());
+		}).exceptionally(ex -> {
+			return "Error!";
 		});
 		
-		
-		
-		CompletableFuture<Void> future7 = CompletableFuture.supplyAsync(() -> {
-//			System.out.println("Hello " + Thread.currentThread().getName());
+		CompletableFuture<String> hello6 = CompletableFuture.supplyAsync(() -> {
+			if (throwError) {
+				throw new IllegalArgumentException();
+			}
+			
+			System.out.println("Hello5 " + Thread.currentThread().getName());
 			return "Hello";
-		}).thenRun(() -> {
-			System.out.println(Thread.currentThread().getName());
+		}).handle((result, ex) -> {
+			if (ex != null) {
+				System.out.println(ex);
+				return "ERROR!";
+			}
+			
+			return result;
 		});
 		
+		System.out.println(hello6.get());
 		
 	}
+	
+	private static CompletableFuture<String> getWorld(String message) {
+		return CompletableFuture.supplyAsync(() -> {
+			System.out.println("World " + Thread.currentThread().getName());
+			return message + " World";
+		});
+	}
+	
 }
