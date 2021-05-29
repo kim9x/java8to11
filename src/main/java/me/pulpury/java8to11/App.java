@@ -1,37 +1,25 @@
 package me.pulpury.java8to11;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Random;
+import java.util.stream.IntStream;
 
-@Chicken("양념")
-@Chicken("마늘간장")
 public class App {
-	
-	// @Target(ElementType.TYPE_USE)를 사용하면 type을 사용하는 모든 곳에서
-	// 사용할 수 있다.
-//	public static void main(@Chicken String[] args) throws @Chicken RuntimeException {
-	public static void main(String[] args) throws RuntimeException {
-//		List<@Chicken String> names = Arrays.asList("Taeju");
+	public static void main(String[] args) {
+		int size = 1500;
+		int[] numbers = new int[size];
+		Random random = new Random();
 		
-		Chicken[] chickens = App.class.getAnnotationsByType(Chicken.class);
-		Arrays.stream(chickens).forEach(c -> {
-			System.out.println(c.value());
-		});
+		IntStream.range(0, size).forEach(i -> numbers[i] = random.nextInt());
+		long start = System.nanoTime();
+		Arrays.sort(numbers);
+		System.out.println("serial soring took " + (System.nanoTime() - start));
 		
-		// Chicken타입이 아닌 ChickenContainer 타입으로도 가져올 수 있다.!
-		ChickenContainer chickenContainer = App.class.getAnnotation(ChickenContainer.class);
-		Arrays.stream(chickenContainer.value()).forEach(c -> {
-			System.out.println(c.value());
-		});
+		IntStream.range(0, size).forEach(i -> numbers[i] = random.nextInt());
+		start = System.nanoTime();
+		// 같은 고리즘에도 불구하고 병렬 방식이므로 속도가 더 빠르다.
+		Arrays.parallelSort(numbers);
+		System.out.println("parallel soring took " + (System.nanoTime() - start));
 	}
-	
-	// @Target(ElementType.TYPE_PARAMETER) 덕분에 사용이 가능하다.
-//	static class FeelsLikeChichichen<@Chicken T> {
-		
-//		public static <@Chicken C> void print(@Chicken C c) {
-//			System.out.println(c);
-//		}
-		
-//	}
 	
 }
